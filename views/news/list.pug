@@ -8,5 +8,6 @@ block content
                     span=item.title
                 td
                     span=item.created_at
-
-
+                td
+                    a(href="/news/"+item.id+"/edit")
+                        button.btn.btn-sm.btn-secondary sửa

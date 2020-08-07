@@ -6,11 +6,22 @@ const auth_1 = require("../middleware/auth");
 const db_1 = require("../helpers/db");
 const router = express_1.Router();
 exports.router = router;
-router.get('/list', async (req, res) => {
+router.get('/list', auth_1.middlewareNotLogin, async (req, res) => {
     let news = await db_1.DB.selectBySql('select * from news');
     res.render('news/list', { news: news });
-}).get('/create', async (req, res) => {
+}).get('/create', auth_1.middlewareNotLogin, async (req, res) => {
     res.render('news/create');
+}).get('/:id/edit', auth_1.middlewareNotLogin, async (req, res) => {
+    let news = await db_1.DB.selectByParams({
+        select: '*',
+        table: 'news',
+        where: ['id', req.params.id],
+        set: '?? = ?'
+    });
+    if (news.length == 0) {
+        return res.render('404');
+    }
+    res.render('news/edit', { news: news[0] });
 }).post('/create', auth_1.middlewareNotLogin, async (req, res) => {
     let news = req.body;
     if (!news.title || !news.content) {
@@ -26,5 +37,6 @@ router.get('/list', async (req, res) => {
             return res.render('index', { success: 'Đã thêm thành công!' });
         }
     }
-    res.send('loi tao bai viet');
+}).put('/update', auth_1.middlewareNotLogin, async (req, res) => {
+    res.send('update');
 });

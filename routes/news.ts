@@ -5,12 +5,23 @@ import { News } from '../models/news'
 
 const router = Router()
 
-router.get('/list', async (req: Request, res: Response) => {
+router.get('/list', middlewareNotLogin, async (req: Request, res: Response) => {
 	let news = await DB.selectBySql('select * from news')
 
 	res.render('news/list', { news: news })
-}).get('/create', async (req: Request, res: Response) => {
+}).get('/create', middlewareNotLogin, async (req: Request, res: Response) => {
 	res.render('news/create')
+}).get('/:id/edit', middlewareNotLogin, async (req: Request, res: Response) => {
+	let news = await DB.selectByParams({
+		select: '*',
+		table: 'news',
+		where: ['id', req.params.id],
+		set: '?? = ?'
+	})
+	if (news.length == 0) {
+		return res.render('404')
+	}
+	res.render('news/edit', { news: news[0] })
 }).post('/create', middlewareNotLogin, async (req: Request, res: Response) => {
 	let news: News = req.body
 
@@ -28,9 +39,9 @@ router.get('/list', async (req: Request, res: Response) => {
 			return res.render('index', { success: 'Đã thêm thành công!' })
 		}
 	}
+}).put('/update', middlewareNotLogin, async (req: Request, res: Response) => {
 
-
-	res.send('loi tao bai viet')
+	res.send('update')
 })
 
 export { router }
