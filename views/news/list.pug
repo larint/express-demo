@@ -1,0 +1,12 @@
+extends ../layout
+
+block content
+    table.table
+        each item in news
+            tr
+                td
+                    span=item.title
+                td
+                    span=item.created_at
+
+

@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    form.col-12.col-md-6(action='/news/create', method='POST')
+        .inputFields
+            .form-group
+                label(for='title' class="label") Tiêu đề
+                input#title.form-control(type='text', name='title', placeholder='', value=old_data?old_data.title : '')
+            .form-group
+                label(for='content') Nội dung
+                textarea#content.form-control(name='content', placeholder='Nội dung', rows=5, cols=10)
+            p.red=error
+            p.green=success
+            .center
+                button.btn.btn-primary.mx-auto(type='submit') Lưu
+
