@@ -6,7 +6,7 @@ const auth_1 = require("../services/auth");
 const auth_2 = require("../middleware/auth");
 const router = express_1.Router();
 exports.router = router;
-router.get('/login', auth_2.middlewareLogined, (req, res) => {
+router.get('/login', auth_2.middlewareLogined, async (req, res) => {
     res.render('login');
 }).post('/login', async (req, res) => {
     if (!req.body.email || !req.body.password) {

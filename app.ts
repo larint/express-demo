@@ -1,12 +1,11 @@
 import * as express from 'express'
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express'
-import * as bodyParser from 'body-parser'
 import * as cookieParser from 'cookie-parser'
 import * as morgan from 'morgan'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as session from 'express-session'
-
+import * as methodOverride from 'method-override'
 import './helpers/db'
 
 //router
@@ -24,18 +23,20 @@ app.set('view engine', 'pug');
 
 var appLogStream = fs.createWriteStream(path.join(__dirname, 'app.log'), { flags: 'a' })
 app.use(morgan('combined', { stream: appLogStream, skip: (req, res) => { return res.statusCode < 400 } }))
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(methodOverride('_method'));
 app.use(session({ secret: "bjhbahsbdjabwdhjbwjdh", resave: true, saveUninitialized: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // pass user to all template
-app.use(function(req, res, next) {
+app.use((req: Request, res: Response, next:NextFunction) =>{
 	res.locals.user = req.session?.user || null
+	res.locals.site_url = process.env.URI_PATH
 	next()
 });
+
 
 app.use(/\/(app.js|package.json)/, (req: Request, res: Response) => res.render('404'))
 app.use('/', indexRouter);

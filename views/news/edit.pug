@@ -1,8 +1,8 @@
 extends ../layout
 
 block content
-    form.col-12.col-md-6(action='/news/update', method='POST')
-        input(type="hidden" name="_method", value="PUT")
+    form.col-12.col-md-6(action='/news/update?_method=PUT', method='POST')
+        input(type="hidden", name="id", value=news.id)
         .inputFields
             .form-group
                 label(for='title' class="label") Tiêu đề

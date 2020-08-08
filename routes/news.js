@@ -6,8 +6,14 @@ const auth_1 = require("../middleware/auth");
 const db_1 = require("../helpers/db");
 const router = express_1.Router();
 exports.router = router;
-router.get('/list', auth_1.middlewareNotLogin, async (req, res) => {
-    let news = await db_1.DB.selectBySql('select * from news');
+router.get('/list/page/:page(\d+)', auth_1.middlewareNotLogin, async (req, res) => {
+    let news = await db_1.DB.selectByParams({
+        table: 'news',
+        select: '*',
+        where: [1],
+        set: "?",
+        limit: "0,3"
+    });
     res.render('news/list', { news: news });
 }).get('/create', auth_1.middlewareNotLogin, async (req, res) => {
     res.render('news/create');
@@ -36,7 +42,17 @@ router.get('/list', auth_1.middlewareNotLogin, async (req, res) => {
         if (isAdded) {
             return res.render('index', { success: 'Đã thêm thành công!' });
         }
+        res.send('Thêm dữ liệu không thành công!');
     }
 }).put('/update', auth_1.middlewareNotLogin, async (req, res) => {
-    res.send('update');
+    let news = req.body;
+    let isUpdate = await db_1.DB.updateItem({
+        table: 'news',
+        where: ['title', news.title, 'content', news.content, 'id', news.id],
+        set: '?? = ?, ?? = ?'
+    });
+    if (isUpdate) {
+        return res.redirect(`/news/${news.id}/edit`);
+    }
+    res.send('Cập nhật không thành công!');
 });

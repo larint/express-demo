@@ -30,7 +30,13 @@ DB.exeQuery = (sql) => {
     });
 };
 DB.selectBySql = async (sql) => await DB.exeQuery(sql);
-DB.selectByParams = async (params) => await DB.exeQuery(mysql.format(`SELECT ${params.select} FROM ${params.table} WHERE ${params.set}`, params.where));
+DB.selectByParams = async (params) => {
+    let limit = '';
+    if (params.limit) {
+        limit = `LIMIT ${params.limit}`;
+    }
+    return await DB.exeQuery(mysql.format(`SELECT ${params.select} FROM ${params.table} WHERE ${params.set} ${limit}`, params.where));
+};
 DB.insertItem = async (params) => await DB.exeQuery(mysql.format(`INSERT INTO ${params.table} SET ${params.set}`, params.where));
 DB.updateItem = async (params) => await DB.exeQuery(mysql.format(`UPDATE ${params.table} SET ${params.set} WHERE ?? = ?`, params.where));
 DB.deleteItem = async (params) => await DB.exeQuery(mysql.format(`DELETE FROM ${params.table} WHERE ${params.set}`, params.where));

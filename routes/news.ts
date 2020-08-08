@@ -5,8 +5,15 @@ import { News } from '../models/news'
 
 const router = Router()
 
-router.get('/list', middlewareNotLogin, async (req: Request, res: Response) => {
-	let news = await DB.selectBySql('select * from news')
+router.get('/list/page/:page(\d+)', middlewareNotLogin, async (req: Request, res: Response) => {
+	// let from: number = req.param.page
+	let news = await DB.selectByParams({
+		table: 'news',
+		select: '*',
+		where: [1],
+		set: "?",
+		limit: "0,3"
+	})
 
 	res.render('news/list', { news: news })
 }).get('/create', middlewareNotLogin, async (req: Request, res: Response) => {
@@ -38,10 +45,21 @@ router.get('/list', middlewareNotLogin, async (req: Request, res: Response) => {
 		if (isAdded) {
 			return res.render('index', { success: 'Đã thêm thành công!' })
 		}
+		res.send('Thêm dữ liệu không thành công!')
 	}
 }).put('/update', middlewareNotLogin, async (req: Request, res: Response) => {
+	let news: News = req.body
 
-	res.send('update')
+	let isUpdate = await DB.updateItem({
+		table: 'news',
+		where: ['title', news.title, 'content', news.content, 'id', news.id],
+		set: '?? = ?, ?? = ?'
+	})
+
+	if(isUpdate) {
+		return res.redirect(`/news/${news.id}/edit`)
+	}
+	res.send('Cập nhật không thành công!')
 })
 
 export { router }

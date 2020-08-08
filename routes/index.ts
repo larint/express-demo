@@ -3,7 +3,7 @@ import { middlewareNotLogin } from '../middleware/auth'
 
 const router = Router()
 
-router.get('/', middlewareNotLogin, (req: Request, res: Response) => {
+router.get('/', middlewareNotLogin, async (req: Request, res: Response) => {
 	res.render('index')
 }).post('/createNew', (req: Request, res: Response) => {
 

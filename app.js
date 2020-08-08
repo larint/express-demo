@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const path = require("path");
 const fs = require("fs");
 const session = require("express-session");
+const methodOverride = require("method-override");
 require("./helpers/db");
 const index_1 = require("./routes/index");
 const auth_1 = require("./routes/auth");
@@ -19,11 +20,13 @@ app.use(morgan('combined', { stream: appLogStream, skip: (req, res) => { return 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(methodOverride('_method'));
 app.use(session({ secret: "bjhbahsbdjabwdhjbwjdh", resave: true, saveUninitialized: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
     var _a;
     res.locals.user = ((_a = req.session) === null || _a === void 0 ? void 0 : _a.user) || null;
+    res.locals.site_url = process.env.URI_PATH;
     next();
 });
 app.use(/\/(app.js|package.json)/, (req, res) => res.render('404'));

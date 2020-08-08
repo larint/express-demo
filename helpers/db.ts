@@ -20,6 +20,7 @@ export interface Params {
 	where: (string | number | boolean | Date)[],
 	set?: string,
 	select?: string,
+	limit?: string
 }
 
 export class DB {
@@ -37,7 +38,13 @@ export class DB {
 	}
 
 	static selectBySql = async (sql: string): Promise<any[] | mysql.MysqlError | any> => await DB.exeQuery(sql)
-	static selectByParams = async (params: Params): Promise<any[] | mysql.MysqlError | any> => await DB.exeQuery(mysql.format(`SELECT ${params.select} FROM ${params.table} WHERE ${params.set}`, params.where))
+	static selectByParams = async (params: Params): Promise<any[] | mysql.MysqlError | any> => {
+		let limit:string | number = ''
+		if(params.limit) {
+			limit = `LIMIT ${params.limit}`		
+		}
+		return await DB.exeQuery(mysql.format(`SELECT ${params.select} FROM ${params.table} WHERE ${params.set} ${limit}`, params.where))
+	}
 	static insertItem = async (params: Params): Promise<any[] | mysql.MysqlError | any> => await DB.exeQuery(mysql.format(`INSERT INTO ${params.table} SET ${params.set}`, params.where))
 	static updateItem = async (params: Params): Promise<any[] | mysql.MysqlError | any> => await DB.exeQuery(mysql.format(`UPDATE ${params.table} SET ${params.set} WHERE ?? = ?`, params.where))
 	static deleteItem = async (params: Params): Promise<any[] | mysql.MysqlError | any> => await DB.exeQuery(mysql.format(`DELETE FROM ${params.table} WHERE ${params.set}`, params.where))

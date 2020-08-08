@@ -2,10 +2,9 @@ import { Router, Request, Response } from 'express'
 import { Auth } from '../services/auth'
 import { Credentials } from '../helpers/type'
 import { middlewareLogined } from '../middleware/auth'
-
 const router = Router()
 
-router.get('/login', middlewareLogined, (req: Request, res: Response) => {
+router.get('/login', middlewareLogined, async (req: Request, res: Response) => {
 	res.render('login')
 }).post('/login', async (req: Request, res: Response) => {
 	if (!req.body.email || !req.body.password) {
