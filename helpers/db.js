@@ -30,6 +30,23 @@ DB.exeQuery = (sql) => {
     });
 };
 DB.selectBySql = async (sql) => await DB.exeQuery(sql);
+DB.paginateByParams = async (params) => {
+    let record = await DB.exeQuery(`select count(*) as total from ${params.table}`);
+    let total = record.length > 0 ? record[0].total : 0;
+    let itemOnPage = params.itemOnPage || total;
+    let totalPage = Math.ceil(total / itemOnPage);
+    let currentPage = params.page || 1;
+    let from = (currentPage - 1) * itemOnPage;
+    let dataSelect = await DB.exeQuery(mysql.format(`SELECT ${params.select} FROM ${params.table} WHERE ${params.set} ORDER BY id DESC LIMIT ${from}, ${itemOnPage}`, params.where));
+    let paginate = {
+        total: total,
+        totalPage: totalPage,
+        link: '',
+        currentPage: currentPage,
+        data: dataSelect
+    };
+    return paginate;
+};
 DB.selectByParams = async (params) => {
     let limit = '';
     if (params.limit) {

@@ -2,20 +2,21 @@ import { Router, Request, Response, NextFunction } from 'express'
 import { middlewareNotLogin } from '../middleware/auth'
 import { DB } from '../helpers/db'
 import { News } from '../models/news'
-
 const router = Router()
 
-router.get('/list/page/:page(\d+)', middlewareNotLogin, async (req: Request, res: Response) => {
-	// let from: number = req.param.page
-	let news = await DB.selectByParams({
+router.get('/list/page/:page?', middlewareNotLogin, async (req: Request, res: Response) => {
+	let from = req.params.page || 1
+
+	let paginate = await DB.paginateByParams({
 		table: 'news',
 		select: '*',
 		where: [1],
 		set: "?",
-		limit: "0,3"
+		page: from as number,
+		itemOnPage: 10
 	})
 
-	res.render('news/list', { news: news })
+	res.render('news/list', { data: paginate })
 }).get('/create', middlewareNotLogin, async (req: Request, res: Response) => {
 	res.render('news/create')
 }).get('/:id/edit', middlewareNotLogin, async (req: Request, res: Response) => {

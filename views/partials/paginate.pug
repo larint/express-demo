@@ -1,0 +1,11 @@
+mixin pagination(data)
+    if data.totalPage > 1
+        nav
+            ul.pagination
+                - var n = 1;
+                while n <= data.totalPage
+                    li.page-item(class= n == data.currentPage ? 'active' : '')
+                        if n == data.currentPage
+                            span.page-link=n++
+                        else
+                            a.page-link(href="/news/list/page/"+n)=n++

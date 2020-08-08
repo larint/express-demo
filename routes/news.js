@@ -6,15 +6,17 @@ const auth_1 = require("../middleware/auth");
 const db_1 = require("../helpers/db");
 const router = express_1.Router();
 exports.router = router;
-router.get('/list/page/:page(\d+)', auth_1.middlewareNotLogin, async (req, res) => {
-    let news = await db_1.DB.selectByParams({
+router.get('/list/page/:page?', auth_1.middlewareNotLogin, async (req, res) => {
+    let from = req.params.page || 1;
+    let paginate = await db_1.DB.paginateByParams({
         table: 'news',
         select: '*',
         where: [1],
         set: "?",
-        limit: "0,3"
+        page: from,
+        itemOnPage: 10
     });
-    res.render('news/list', { news: news });
+    res.render('news/list', { data: paginate });
 }).get('/create', auth_1.middlewareNotLogin, async (req, res) => {
     res.render('news/create');
 }).get('/:id/edit', auth_1.middlewareNotLogin, async (req, res) => {

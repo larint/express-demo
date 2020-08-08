@@ -20,8 +20,19 @@ export interface Params {
 	where: (string | number | boolean | Date)[],
 	set?: string,
 	select?: string,
-	limit?: string
+	limit?: string,
+	page?: number,
+	itemOnPage?: number
 }
+
+export interface Paginate {
+	total: number,
+	link: string,
+	currentPage: number,
+	totalPage: number,
+	data: Array<any>
+}
+
 
 export class DB {
 
@@ -38,6 +49,27 @@ export class DB {
 	}
 
 	static selectBySql = async (sql: string): Promise<any[] | mysql.MysqlError | any> => await DB.exeQuery(sql)
+	static paginateByParams = async (params: Params) => {
+		let record = await DB.exeQuery(`select count(*) as total from ${params.table}`)
+		
+		let total: number = record.length > 0 ? record[0].total : 0
+		let itemOnPage = params.itemOnPage || total
+		let totalPage: number = Math.ceil(total/itemOnPage)
+		let currentPage: number = params.page || 1
+		let from: number = (currentPage - 1) * itemOnPage
+
+		let dataSelect = await DB.exeQuery(mysql.format(`SELECT ${params.select} FROM ${params.table} WHERE ${params.set} ORDER BY id DESC LIMIT ${from}, ${itemOnPage}`, params.where))
+
+		let paginate: Paginate = {
+			total: total,
+			totalPage: totalPage,
+			link: '',
+			currentPage: currentPage,
+			data: dataSelect
+		}
+
+		return paginate
+	}
 	static selectByParams = async (params: Params): Promise<any[] | mysql.MysqlError | any> => {
 		let limit:string | number = ''
 		if(params.limit) {

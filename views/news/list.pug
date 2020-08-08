@@ -1,13 +1,16 @@
 extends ../layout
+include ../partials/paginate.pug
 
 block content
     table.table
-        each item in news
+        each item in data.data
             tr
                 td
                     span=item.title
                 td
-                    span=item.created_at
+                    -var date = new Date(item.created_at)
+                    span=date.toLocaleDateString("en-US")
                 td
                     a(href="/news/"+item.id+"/edit")
                         button.btn.btn-sm.btn-secondary sửa
+    +pagination(data)
