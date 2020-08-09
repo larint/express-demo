@@ -61,6 +61,19 @@ router.get('/list/page/:page?', middlewareNotLogin, async (req: Request, res: Re
 		return res.redirect(`/news/${news.id}/edit`)
 	}
 	res.send('Cập nhật không thành công!')
+}).delete('/delete', middlewareNotLogin, async (req: Request, res: Response) => {
+	let news: News = req.body
+
+	let isDelete = await DB.deleteItem({
+		table: 'news',
+		where: ['id', news.id],
+		set: '?? = ?'
+	})
+
+	if(isDelete) {
+		return res.redirect('back')
+	}
+	res.send('Xoá không thành công!')
 })
 
 export { router }

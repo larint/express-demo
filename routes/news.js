@@ -57,4 +57,15 @@ router.get('/list/page/:page?', auth_1.middlewareNotLogin, async (req, res) => {
         return res.redirect(`/news/${news.id}/edit`);
     }
     res.send('Cập nhật không thành công!');
+}).delete('/delete', auth_1.middlewareNotLogin, async (req, res) => {
+    let news = req.body;
+    let isDelete = await db_1.DB.deleteItem({
+        table: 'news',
+        where: ['id', news.id],
+        set: '?? = ?'
+    });
+    if (isDelete) {
+        return res.redirect('back');
+    }
+    res.send('Xoá không thành công!');
 });
